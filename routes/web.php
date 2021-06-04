@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,3 +21,7 @@ Route::get('/', function () {
 Route::group(['middleware' => 'web'], function () {
     Route::get(env('LARAVUE_PATH'), 'LaravueController@index')->where('any', '.*')->name('laravue');
 });
+Route::get('/servers', 'ServersController@servers');
+// Notification::route('telegram','1836323502')
+//     ->notify(new TelegramController());
+// Route::post('/send-message', 'TelegramBotController@storeMessage');

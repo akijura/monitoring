@@ -3,8 +3,8 @@
     <div class="login-container">
       <div class="login-image">
         <div class="photo-credit">
-          <h4>Danang - Vietnam</h4>
-          <span>Photo by Kiril Dobrev on Unsplash</span>
+          <h4>Hamkor - Servers</h4>
+          <span>Monitoring Servers</span>
         </div>
       </div>
       <div class="login-content">
@@ -47,10 +47,10 @@
               {{ $t('login.logIn') }}
             </el-button>
           </el-form-item>
-          <div class="tips">
+          <!-- <div class="tips">
             <span style="margin-right:20px;">Email: admin@laravue.dev</span>
             <span>Password: laravue</span>
-          </div>
+          </div> -->
         </el-form>
       </div>
     </div>
@@ -62,7 +62,7 @@ import LangSelect from '@/components/LangSelect';
 import { validEmail } from '@/utils/validate';
 import { csrf } from '@/api/auth';
 
-const logo = require('@/assets/login/logo.png').default;
+const logo = require('@/assets/login/hamkor_logo.png').default;
 
 export default {
   name: 'Login',
@@ -84,8 +84,8 @@ export default {
     };
     return {
       loginForm: {
-        email: 'admin@laravue.dev',
-        password: 'laravue',
+        email: '',
+        password: '',
       },
       loginRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
@@ -125,6 +125,7 @@ export default {
           csrf().then(() => {
             this.$store.dispatch('user/login', this.loginForm)
               .then(() => {
+          
                 this.$router.push({ path: this.redirect || '/', query: this.otherQuery }, onAbort => {});
                 this.loading = false;
               })
@@ -223,8 +224,8 @@ $textColor:#eee;
       flex-direction: row;
       justify-content: flex-end;
       overflow: hidden;
-      background-color: #303c4b;
-      background-image: url('../../assets/login/login_background.jpg');
+      background-color: #b0b6be;
+      background-image: url('../../assets/login/login_hamkor.jpg');
       background-position: 50%;
       background-size: cover;
       opacity: 1;

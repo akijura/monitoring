@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      title: 'Laravel Vue Admin',
-      logo: '/svg/logo.svg',
+      title: 'Hamkor Bank',
+      logo: '/images/hamkor_logo.png',
     };
   },
 };

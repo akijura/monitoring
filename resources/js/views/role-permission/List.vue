@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+    <el-button class="filter-item" style="margin-right: 60px; margin-bottom: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
+      {{ $t('table.add') }}
+    </el-button>
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
@@ -7,22 +10,29 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="150" align="center" :label="$t('table.name')">
+      <el-table-column min-width="150" align="center" :label="$t('table.name')">
         <template slot-scope="scope">
           <span>{{ scope.row.name | uppercaseFirst }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="left" :label="$t('table.description')">
+      <!-- <el-table-column align="left" :label="$t('table.description')">
         <template slot-scope="scope">
           <span>{{ scope.row.description }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column v-if="checkPermission(['manage permission'])" align="center" label="Actions" width="200">
         <template slot-scope="scope">
           <el-button v-if="scope.row.name !== 'admin'" v-permission="['manage permission']" type="primary" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
             {{ $t('permission.editPermission') }}
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="Delete" width="200">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.name !== 'admin'" v-permission="['manage permission']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id)">
+            {{ $t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -57,12 +67,30 @@
         </div>
       </div>
     </el-dialog>
+    <el-dialog :title="'Create new role'" :visible.sync="dialogFormVisible">
+      <div v-loading="roleCreating" class="form-container">
+        <el-form ref="roleForm" :model="newRole" label-position="left" label-width="150px" style="max-width: 500px;">
+          <el-form-item :label="$t('user.role')" prop="role">
+            <el-input v-model="newRole.name" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">
+            {{ $t('table.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="onSubmit">
+            {{ $t('table.confirm') }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Resource from '@/api/resource';
 import RoleResource from '@/api/role';
+import { createRole, deleteRole } from '@/api/role';
 import waves from '@/directive/waves'; // Waves directive
 import permission from '@/directive/permission'; // Permission directive (v-permission)
 import checkPermission from '@/utils/permission'; // Permission checking
@@ -75,11 +103,18 @@ export default {
   directives: { waves, permission },
   data() {
     return {
+
       currentRoleId: 1,
       list: [],
       loading: true,
       dialogLoading: false,
       dialogVisible: false,
+      dialogFormVisible: false,
+      newRole: {
+        name: '',
+        guard_name: 'api',
+      },
+      roleCreating: false,
       permissions: [],
       menuPermissions: [],
       otherPermissions: [],
@@ -134,7 +169,69 @@ export default {
       this.menuPermissions = menu;
       this.otherPermissions = other;
     },
+    resetNewRole() {
+      this.newRole = {
+        name: '',
+      };
+    },
+    handleCreate() {
+      this.resetNewRole();
+      this.dialogFormVisible = true;
+      // this.$nextTick(() => {
+      //   this.$refs['userForm'].clearValidate();
+      // });
+    },
+    onSubmit() {
+      this.roleCreating = true;
+      roleResource
+        .store(this.newRole)
+        .then(response => {
+          console.log(response.error);
+          this.$message({
+            message: 'New user ' + this.newRole.name + ' has been created successfully.',
+            type: 'success',
+            duration: 5 * 1000,
+          });
+          this.resetNewRole();
+          this.roleCreating = false;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.roleCreating = false;
+          this.getRoles();
+        });
 
+      //     this.roleCreating = true;
+      //     await createRole(this.newRole).then(() => {
+      //     this.$notify({
+      //     title: 'Success',
+      //     message: 'Created successfully',
+      //     type: 'success',
+      //     duration: 2000,
+      //   });
+      // });
+      // this.resetNewRole();
+      this.dialogFormVisible = false;
+
+      this.getRoles();
+      this.roleCreating = false;
+    },
+    async handleDelete(id) {
+      this.roleCreating = true;
+      await deleteRole(id).then(() => {
+        this.$notify({
+          title: 'Success',
+          message: 'Updated successfully',
+          type: 'success',
+          duration: 2000,
+        });
+      });
+
+      this.getRoles();
+      this.roleCreating = false;
+    },
     classifyPermissions(permissions) {
       const all = []; const menu = []; const other = [];
       permissions.forEach(permission => {

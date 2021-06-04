@@ -43,15 +43,15 @@
 
       <el-table-column align="center" label="Actions" width="350">
         <template slot-scope="scope">
-          <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id">
-            <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
-              Edit
-            </el-button>
-          </router-link>
-          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            Permissions
+
+          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id)">
+            Edit
           </el-button>
-          <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+
+          <!-- <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
+            Permissions
+          </el-button> -->
+          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Delete
           </el-button>
         </template>
@@ -90,7 +90,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="'Create new user'" :visible.sync="dialogFormVisible">
+    <el-dialog v-loading="loadingAdd" :title="'Create new user'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item :label="$t('user.role')" prop="role">
@@ -121,16 +121,42 @@
         </div>
       </div>
     </el-dialog>
+    <el-dialog v-loading="editLoading" :visible.sync="dialogFormUpdateVisible">
+      <el-form ref="dataForm" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item :label="$t('user.name')" prop="title">
+          <el-input v-model="form.editname" value="form.editname" />
+        </el-form-item>
+        <el-form-item :label="$t('user.email')" prop="title">
+          <el-input v-model="form.editemail" value="form.editemail" />
+        </el-form-item>
+        <el-form-item :label="$t('user.role')" prop="role">
+          <el-select v-model="form.editrole" class="filter-item" placeholder="Please select role">
+            <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormUpdateVisible = false">
+          {{ $t('table.cancel') }}
+        </el-button>
+        <el-button type="primary" @click="update">
+          {{ $t('table.confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import UserResource from '@/api/user';
+import { fetchEditUser, UpdateUser, getRoles } from '@/api/user';
 import Resource from '@/api/resource';
 import waves from '@/directive/waves'; // Waves directive
 import permission from '@/directive/permission'; // Permission directive
 import checkPermission from '@/utils/permission'; // Permission checking
+import RoleResource from '@/api/role';
+const roleResource = new RoleResource();
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -148,9 +174,16 @@ export default {
       }
     };
     return {
+      form: {
+        editname: '',
+        editemail: '',
+        editid: '',
+        editrole: '',
+      },
       list: null,
       total: 0,
       loading: true,
+      editLoading: false,
       downloading: false,
       userCreating: false,
       query: {
@@ -159,12 +192,15 @@ export default {
         keyword: '',
         role: '',
       },
+      loadingAdd: false,
       roles: ['admin', 'manager', 'editor', 'user', 'visitor'],
-      nonAdminRoles: ['editor', 'user', 'visitor'],
+      nonAdminRoles: [],
+      list: [],
       newUser: {},
       dialogFormVisible: false,
       dialogPermissionVisible: false,
       dialogPermissionLoading: false,
+      dialogFormUpdateVisible: false,
       currentUserId: 0,
       currentUser: {
         name: '',
@@ -276,22 +312,62 @@ export default {
       this.loading = true;
       const { data, meta } = await userResource.list(this.query);
       this.list = data;
+
       this.list.forEach((element, index) => {
         element['index'] = (page - 1) * limit + index + 1;
       });
       this.total = meta.total;
       this.loading = false;
     },
+    async handleUpdate(id) {
+      this.editLoading = true;
+      await getRoles().then(response => {
+        response.data.nonAdminRole.forEach((eachRole, index) => {
+          this.nonAdminRoles[index] = eachRole['name'];
+        });
+      });
+      fetchEditUser(id).then(response => {
+        this.form.editname = response.data.editItems.name;
+        this.form.editemail = response.data.editItems.email;
+        this.form.editid = response.data.editItems.id;
+        this.form.editrole = response.data.current;
+      });
+
+      // this.id = id; // copy obj
+      this.dialogFormUpdateVisible = true;
+      this.editLoading = false;
+    },
+    async update(){
+      await UpdateUser(this.form).then(() => {
+        this.dialogFormUpdateVisible = false;
+        this.$notify({
+          title: 'Success',
+          message: 'Updated successfully',
+          type: 'success',
+          duration: 2000,
+        });
+      });
+
+      this.getList();
+    },
+
     handleFilter() {
       this.query.page = 1;
       this.getList();
     },
-    handleCreate() {
+    async handleCreate() {
+      this.loadingAdd = true;
+      await getRoles().then(response => {
+        response.data.nonAdminRole.forEach((eachRole, index) => {
+          this.nonAdminRoles[index] = eachRole['name'];
+        });
+      });
       this.resetNewUser();
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs['userForm'].clearValidate();
       });
+      this.loadingAdd = false;
     },
     handleDelete(id, name) {
       this.$confirm('This will permanently delete user ' + name + '. Continue?', 'Warning', {
@@ -336,10 +412,12 @@ export default {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
           this.newUser.roles = [this.newUser.role];
+
           this.userCreating = true;
           userResource
             .store(this.newUser)
             .then(response => {
+              console.log(this.newUser.roles);
               this.$message({
                 message: 'New user ' + this.newUser.name + '(' + this.newUser.email + ') has been created successfully.',
                 type: 'success',

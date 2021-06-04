@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
+
 /**
  * Class AuthController
  *
@@ -28,12 +29,13 @@ class AuthController extends BaseController
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+       
         if (!Auth::attempt($credentials)) {
             return response()->json(new JsonResponse([], 'login_error'), Response::HTTP_UNAUTHORIZED);
         }
 
         $user = $request->user();
-
+        
         return response()->json(new JsonResponse(new UserResource($user)), Response::HTTP_OK);
     }
 

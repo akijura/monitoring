@@ -24,12 +24,12 @@ const exampleRoutes = {
       meta: { title: 'editArticle', noCache: true },
       hidden: true,
     },
-    {
-      path: 'list',
-      component: () => import('@/views/example/List'),
-      name: 'ArticleList',
-      meta: { title: 'articleList', icon: 'list' },
-    },
+    // {
+    //   path: 'list',
+    //   component: () => import('@/views/example/List'),
+    //   name: 'ArticleList',
+    //   meta: { title: 'articleList', icon: 'list' },
+    // },
   ],
 };
 

@@ -33,11 +33,11 @@
               {{ $t('navbar.profile') }}
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/tuandm/laravue/">
+          <!-- <a target="_blank" href="https://github.com/tuandm/laravue/">
             <el-dropdown-item>
               {{ $t('navbar.github') }}
             </el-dropdown-item>
-          </a>
+          </a> -->
           <el-dropdown-item divided>
             <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>

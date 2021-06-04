@@ -12,7 +12,7 @@
           {{ getRole() }}
         </div>
       </div>
-      <div class="box-social">
+      <!-- <div class="box-social">
         <el-table :data="social" :show-header="false">
           <el-table-column prop="name" label="Name" />
           <el-table-column label="Count" align="left" width="100">
@@ -21,12 +21,12 @@
             </template>
           </el-table-column>
         </el-table>
-      </div>
-      <div class="user-follow">
+      </div> -->
+      <!-- <div class="user-follow">
         <el-button type="primary" style="width: 100%;">
           Follow
         </el-button>
-      </div>
+      </div> -->
     </div>
   </el-card>
 </template>

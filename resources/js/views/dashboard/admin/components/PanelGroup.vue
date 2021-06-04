@@ -1,71 +1,90 @@
 <template>
-  <el-row :gutter="40" class="panel-group">
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+  <el-row :gutter="40" class="panel-group" v-loading="listLoading">
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(item, index) in list"
+          :key="index" >
+      <div class="card-panel" @click="handleSetLineChartData(item.name)">
         <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
+          <svg-icon icon-class="international" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">
-            New Visits
+          <div class="card-panel-text"  v-bind:style="item.name === activeItem ? activePanel : nonActive" >
+            {{ item.name }}
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+         
+          <count-to :start-val="0" :end-val="item.total" :duration="2600" class="card-panel-num" /><span> Errors</span>
         </div>
       </div>
     </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('messages')">
-        <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">
-            Messages
-          </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('purchases')">
-        <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="money" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">
-            Purchases
-          </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-        <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">
-            Shoppings
-          </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
-        </div>
-      </div>
-    </el-col>
+
+
+
   </el-row>
 </template>
 
 <script>
 import CountTo from 'vue-count-to';
-
+import ServerResource from '@/api/type';
+import { fetchErrorsCount } from '@/api/type';
+const serverResource = new ServerResource();
 export default {
   components: {
     CountTo,
   },
+
+    data() {
+      
+    return {
+       activePanel: {
+    color: 'red',
+    fontSize: '30px'
+  },
+         nonActive: {
+
+  },
+    list: [],
+      query: {
+        page: 1,
+        limit: 15,
+        keyword: '',
+        type: '',
+        user: '',
+      },
+      listLoading: true,
+      isActive: false,
+      activeItem: "Shina",
+      counts: 0,
+    };
+  },
+    created() {
+    // this.getList();
+    this.countErrors();
+
+  },
   methods: {
     handleSetLineChartData(type) {
+        this.activeItem = type;
       this.$emit('handleSetLineChartData', type);
     },
+    // async getList() {
+    //   const { limit, page } = this.query;
+    //   this.listLoading = true;
+    //   const { data, meta } = await serverResource.list(this.query);
+    //   this.list = data;
+    //   this.list.forEach((element, index) => {
+    //     console.log(element.name);
+    //     element['index'] = (page - 1) * limit + index + 1;
+    //   });
+    //   this.listLoading = false;
+    // },
+    async countErrors() {
+     this.listLoading = true; 
+    await fetchErrorsCount().then(response => {
+
+       this.list = response.data.countData;
+     
+      });
+      this.listLoading = false;
+    }
   },
 };
 </script>
@@ -134,7 +153,7 @@ export default {
       .card-panel-text {
         line-height: 18px;
         color: rgba(0, 0, 0, 0.45);
-        font-size: 16px;
+        font-size: 23px;
         margin-bottom: 12px;
       }
       .card-panel-num {

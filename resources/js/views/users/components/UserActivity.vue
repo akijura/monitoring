@@ -1,7 +1,7 @@
 <template>
   <el-card v-if="user.name">
     <el-tabs v-model="activeActivity" @tab-click="handleClick">
-      <el-tab-pane label="Activity" name="first">
+      <!-- <el-tab-pane label="Activity" name="first">
         <div class="user-activity">
           <div class="post">
             <div class="user-block">
@@ -116,8 +116,8 @@
             <el-input placeholder="Type a comment" />
           </div>
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="Timeline" name="second">
+      </el-tab-pane> -->
+      <!-- <el-tab-pane label="Timeline" name="second">
         <div class="block">
           <el-timeline>
             <el-timeline-item timestamp="2019/4/17" placement="top">
@@ -147,7 +147,7 @@
             </el-timeline-item>
           </el-timeline>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane v-loading="updating" label="Account" name="third">
         <el-form-item label="Name">
           <el-input v-model="user.name" :disabled="user.role === 'admin'" />
@@ -185,7 +185,7 @@ export default {
   },
   data() {
     return {
-      activeActivity: 'first',
+      activeActivity: 'third',
       carouselImages: [
         'https://cdn.laravue.dev/photo1.png',
         'https://cdn.laravue.dev/photo2.png',

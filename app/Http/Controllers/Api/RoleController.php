@@ -13,7 +13,8 @@ use App\Laravue\Models\Permission;
 use Illuminate\Http\Request;
 use App\Laravue\Models\Role;
 use App\Http\Resources\RoleResource;
-
+use Illuminate\Support\Facades\DB;
+use Validator;
 /**
  * Class RoleController
  *
@@ -39,7 +40,18 @@ class RoleController extends BaseController
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:roles|max:255',
+        ]);
+        if ($validated == false) {
+            return response()->json(['errors' => $validated->errors()], 403);
+        } else {
+            $params = $request->all();
+            $role = Role::create([
+                'name' => $params['name'],
+            ]);
+            return new RoleResource($role);
+            }
     }
 
     /**
@@ -51,6 +63,14 @@ class RoleController extends BaseController
     public function show(Role $role)
     {
         //
+    }
+    public function Create()
+    {
+        $role = new Role;
+        $role->name = request()->name;
+        $role->guard_name = request()->guard_name;
+        $role->save();
+        return $role;
     }
 
     /**
@@ -94,4 +114,18 @@ class RoleController extends BaseController
     {
         return PermissionResource::collection($role->permissions);
     }
+    public function Delete($id) {
+        $role = Role::find($id)->delete();
+        DB::table('role_has_permissions')
+        ->where('role_id',$id)
+        ->delete();
+        return 'ok';
+      }
+      private function getValidationRules($isNew = true)
+      {
+          return [
+              'name' => $isNew ? 'required|name|unique:roles' : 'required|name',
+          ];
+      }
+
 }

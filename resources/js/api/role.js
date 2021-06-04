@@ -13,5 +13,18 @@ class RoleResource extends Resource {
     });
   }
 }
+export function createRole(data) {
+  return request({
+    url: '/roles/create',
+    method: 'post',
+    data,
+  });
+}
+export function deleteRole(id) {
+  return request({
+    url: '/roles/delete/' + id,
+    method: 'delete',
+  });
+}
 
 export { RoleResource as default };

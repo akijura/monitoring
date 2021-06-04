@@ -20,6 +20,18 @@ class Resource {
       method: 'get',
     });
   }
+  getErrors(type) {
+    return request({
+      url: '/' + this.uri + '/' + type,
+      method: 'get',
+    });
+  }
+  getEdit(phone,user) {
+    return request({
+      url: '/' + this.uri + '/' + phone + '/' + user,
+      method: 'get',
+    });
+  }
   store(resource) {
     return request({
       url: '/' + this.uri,

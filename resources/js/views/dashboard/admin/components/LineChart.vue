@@ -78,10 +78,10 @@ export default {
         this.__resizeHandler();
       }
     },
-    setOptions({ expectedData, actualData } = {}) {
+    setOptions({ expectedData } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['January', 'February', 'March', 'April', 'May', 'June', 'July','August','September','October','November','December'],
           boundaryGap: false,
           axisTick: {
             show: false,
@@ -107,11 +107,11 @@ export default {
           },
         },
         legend: {
-          data: ['expected', 'actual'],
+          data: ['errors'],
         },
         series: [
           {
-            name: 'expected',
+            name: 'errors',
             itemStyle: {
               normal: {
                 color: '#FF005A',
@@ -127,26 +127,26 @@ export default {
             animationDuration: 2800,
             animationEasing: 'cubicInOut',
           },
-          {
-            name: 'actual',
-            smooth: true,
-            type: 'line',
-            itemStyle: {
-              normal: {
-                color: '#3888fa',
-                lineStyle: {
-                  color: '#3888fa',
-                  width: 2,
-                },
-                areaStyle: {
-                  color: '#f3f8ff',
-                },
-              },
-            },
-            data: actualData,
-            animationDuration: 2800,
-            animationEasing: 'quadraticOut',
-          },
+          // {
+          //   name: 'actual',
+          //   smooth: true,
+          //   type: 'line',
+          //   itemStyle: {
+          //     normal: {
+          //       color: '#3888fa',
+          //       lineStyle: {
+          //         color: '#3888fa',
+          //         width: 2,
+          //       },
+          //       areaStyle: {
+          //         color: '#f3f8ff',
+          //       },
+          //     },
+          //   },
+          //   data: actualData,
+          //   animationDuration: 2800,
+          //   animationEasing: 'quadraticOut',
+          // },
         ],
       });
     },

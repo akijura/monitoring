@@ -21,5 +21,24 @@ class UserResource extends Resource {
     });
   }
 }
+export function fetchEditUser(id) {
+  return request({
+    url: '/user/' + id,
+    method: 'get',
+  });
+}
+export function UpdateUser(data) {
+  return request({
+    url: '/user/update',
+    method: 'post',
+    data,
+  });
+}
+export function getRoles() {
+  return request({
+    url: '/userroles',
+    method: 'get',
 
+  });
+}
 export { UserResource as default };

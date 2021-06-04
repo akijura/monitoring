@@ -13,6 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        Commands\checkStatus::class,
+        Commands\Permissions::class,
+        Commands\canMessages::class,
         //
     ];
 
@@ -24,7 +27,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('check:status')
+                 ->everyMinute();
+        $schedule->command('give:permissions')
+                ->between('9:00', '9:10'); //Send message has been False (Kun yopish gurpasida)
+        $schedule->command('can:messages')
+                ->between('17:55', '18:05'); //Send message has been True (Kun yopish gurpasida)
     }
 
     /**

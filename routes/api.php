@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\ServerResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Laravue\Faker;
@@ -19,6 +20,25 @@ use \App\Laravue\Acl;
 */
 
 Route::namespace('Api')->group(function() {
+    Route::get('/send-message', 'TelegramBotController@storeMessage');
+    Route::get('/updated-activity', 'TelegramBotController@updatedActivity');
+    Route::post('/servers/create', 'ServersController@create');
+    Route::post('/servers/update', 'ServersController@update');
+    Route::post('/server_type/create', 'ServerTypesController@create');
+    Route::get('/server_type/list_count', 'ServerTypesController@listWithCount');
+    Route::get('/server_type/getTypes', 'ServerTypesController@gettypes');
+    Route::delete('/servers/delete/{id}', 'ServersController@delete');
+    Route::get('/servers/request/{id}', 'ServersController@request');
+    Route::get('/servers', 'ServersController@servers');
+    Route::get('/servers_list', 'SmsController@servers');
+    Route::get('/users_list', 'SmsController@usersList');
+    Route::post('/sms/update', 'SmsController@updatesms');
+    Route::delete('/sms/deleteList/{phone_number}/user/{user_id}', 'SmsController@delete');
+    // Route::post('/sms/editList/', 'SmsController@editList');
+    Route::get('/servers/errors/{type}', 'ServersController@getErrors');
+    Route::get('/servers/{id}', 'ServersController@edit');
+    Route::get('/user/{id}', 'UserController@edit');
+    Route::post('/user/update', 'UserController@updateuser');
     Route::post('auth/login', 'AuthController@login');
     Route::group(['middleware' => 'auth:sanctum'], function () {
         // Auth routes
@@ -28,17 +48,24 @@ Route::namespace('Api')->group(function() {
         Route::get('/user', function (Request $request) {
             return new UserResource($request->user());
         });
-
+        Route::get('/types', function (Request $request) {
+            return new ServerResource($request->type());
+        });
         // Api resource routes
         Route::apiResource('roles', 'RoleController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
         Route::apiResource('users', 'UserController')->middleware('permission:' . Acl::PERMISSION_USER_MANAGE);
         Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
-
+        Route::apiResource('types', 'ServerTypesController');
+        Route::apiResource('sms', 'SmsController');
         // Custom routes
         Route::put('users/{user}', 'UserController@update');
         Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
         Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' .Acl::PERMISSION_PERMISSION_MANAGE);
         Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('sms/{user}/{phone}', 'SmsController@editList');
+        Route::post('roles/create', 'RoleController@create');
+        Route::delete('roles/delete/{id}', 'RoleController@delete');
+        Route::get('userroles', 'UserController@userroles');
     });
 });
 
@@ -83,7 +110,7 @@ Route::get('/articles', function () {
     $data = [];
     for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
         $row = [
-            'id' => mt_rand(100, 10000),
+            'id' => mt_rand(100, 1000),
             'display_time' => Faker::randomDateTime()->format('Y-m-d H:i:s'),
             'title' => Faker::randomString(mt_rand(20, 50)),
             'author' => Faker::randomString(mt_rand(5, 10)),
@@ -106,6 +133,34 @@ Route::get('/articles', function () {
 
     return response()->json(new JsonResponse(['items' => $data, 'total' => mt_rand(1000, 10000)]));
 });
+// Route::get('/servers', function () {
+//     $rowsNumber = 50;
+//     $data = [];
+//     for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+//         $row = [
+//             'id' => mt_rand(100, 1000),
+//             'display_time' => Faker::randomDateTime()->format('Y-m-d H:i:s'),
+//             'title' => Faker::randomString(mt_rand(20, 50)),
+//             'author' => Faker::randomString(mt_rand(5, 10)),
+//             'comment_disabled' => Faker::randomBoolean(),
+//             'content' => Faker::randomString(mt_rand(100, 300)),
+//             'content_short' => Faker::randomString(mt_rand(30, 50)),
+//             'status' => Faker::randomInArray(['deleted', 'published', 'draft']),
+//             'forecast' => mt_rand(100, 9999) / 100,
+//             'image_uri' => 'https://via.placeholder.com/400x300',
+//             'importance' => mt_rand(1, 3),
+//             'pageviews' => mt_rand(10000, 999999),
+//             'reviewer' => Faker::randomString(mt_rand(5, 10)),
+//             'timestamp' => Faker::randomDateTime()->getTimestamp(),
+//             'type' => Faker::randomInArray(['US', 'VI', 'JA']),
+
+//         ];
+
+//         $data[] = $row;
+//     }
+
+//     return response()->json(new JsonResponse(['items' => $data, 'total' => mt_rand(1000, 10000)]));
+// });
 
 Route::get('articles/{id}', function ($id) {
     $article = [
