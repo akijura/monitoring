@@ -11,7 +11,7 @@
     </div>
 
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
-            <el-table-column align="center" :label="$t('sms.user_name')" width="180">
+      <el-table-column align="center" :label="$t('sms.user_name')" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.user_name }}</span>
         </template>
@@ -21,49 +21,53 @@
           <span>{{ scope.row.phone_number }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('sms.server_name')" >
+      <el-table-column align="center" :label="$t('sms.server_name')">
         <template slot-scope="scope">
-          <span>{{ scope.row.server_name}}</span>
+          <span>{{ scope.row.server_name }}</span>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Actions" width="350">
         <template slot-scope="scope">
 
-          <el-button v-role="['admin']"  type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.phone_number,scope.row.user_id)">
+          <el-button v-role="['admin']" type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.phone_number,scope.row.user_id)">
             Edit
           </el-button>
 
           <!-- <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
             Permissions
           </el-button> -->
-          <el-button v-role="['admin']"  type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.phone_number,scope.row.user_id);">
+          <el-button v-role="['admin']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.phone_number,scope.row.user_id);">
             Delete
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-
     <el-dialog v-loading="loadingAdd" :title="'Create new connection'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="newSms" :rules="rules" :model="newSms" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item :label="$t('sms.server_name')" prop="server_id">
-               <el-select multiple filterable  
+            <el-select
+              v-model="newSms.server_id"
+              multiple
+              filterable
+              class="filter-item"
+              collapse-tags
+              placeholder="Please select servers"
+              required
+            >
+              <el-option
+                v-for="item in servers"
+                :key="item.id"
                 class="filter-item"
-                collapse-tags
-                v-model="newSms.server_id"
-                placeholder="Please select servers" required>
-                <el-option v-for="item in servers"
-                        class="filter-item"
-                        :value="item.id"
-                        :label="item.name | uppercaseFirst"
-                        :key="item.id">
-                </el-option>
+                :value="item.id"
+                :label="item.name | uppercaseFirst"
+              />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('sms.user_name')" prop="user_id">
-             <el-select v-model="newSms.user_id" class="filter-item" placeholder="Please select user" filterable >
+            <el-select v-model="newSms.user_id" class="filter-item" placeholder="Please select user" filterable>
               <el-option v-for="item in userList" :key="item.id" :label="item.name | uppercaseFirst" :value="item.id" />
             </el-select>
           </el-form-item>
@@ -84,24 +88,29 @@
     <el-dialog v-loading="editLoading" :visible.sync="dialogFormUpdateVisible">
       <el-form ref="dataForm" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item :label="$t('sms.user_name')" prop="user_id">
-              <el-input v-model="formEditSms.editUserName" :disabled="true" />
-          </el-form-item>
-           <el-form-item :label="$t('sms.phone_number')" prop="phone_number">
-            <el-input v-model="formEditSms.editPhoneNumber" :disabled="true"/>
-          </el-form-item>
+          <el-input v-model="formEditSms.editUserName" :disabled="true" />
+        </el-form-item>
+        <el-form-item :label="$t('sms.phone_number')" prop="phone_number">
+          <el-input v-model="formEditSms.editPhoneNumber" :disabled="true" />
+        </el-form-item>
         <el-form-item :label="$t('sms.server_name')" prop="server_id">
-           <el-select multiple filterable  
-                class="filter-item"
-                collapse-tags
-                v-model="formEditSms.editServerId"
-                placeholder="Please select servers" required>
-                <el-option v-for="item in servers"
-                        class="filter-item"
-                        :value="item.id"
-                        :label="item.name | uppercaseFirst"
-                        :key="item.id">
-                </el-option>
-            </el-select>
+          <el-select
+            v-model="formEditSms.editServerId"
+            multiple
+            filterable
+            class="filter-item"
+            collapse-tags
+            placeholder="Please select servers"
+            required
+          >
+            <el-option
+              v-for="item in servers"
+              :key="item.id"
+              class="filter-item"
+              :value="item.id"
+              :label="item.name | uppercaseFirst"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -118,20 +127,20 @@
 
 <script>
 import SmsResource from '@/api/sms';
-import { getServerList, getUserList, editList,UpdateSmsConnection,DeleteSms} from '@/api/sms';
+import { getServerList, getUserList, editList, UpdateSmsConnection, DeleteSms } from '@/api/sms';
 import waves from '@/directive/waves'; // Waves directive
 import role from '@/directive/role/index.js';
 const smsResource = new SmsResource();
 
 export default {
   name: 'UserList',
-  directives: { role,waves },
+  directives: { role, waves },
   data() {
     return {
       newSms: {
-          user_id: '',
-          server_id:[],
-          phone_number: '',
+        user_id: '',
+        server_id: [],
+        phone_number: '',
       },
       servers: [],
       userList: [],
@@ -139,7 +148,7 @@ export default {
         editPhoneNumber: '',
         editServerId: [],
         editUserId: '',
-        editUserName:'',
+        editUserName: '',
       },
       editList: {
         sendPhone: '',
@@ -177,40 +186,39 @@ export default {
     this.getListSms();
   },
   methods: {
-      async getListSms() {
+    async getListSms() {
       this.loading = true;
       await smsResource.list(this.query).then(response => {
-       
-        this.list = response.data.result
+        this.list = response.data.result;
       });
       this.loading = false;
-      },
+    },
 
-    async handleUpdate(phone_number,user_id) {
+    async handleUpdate(phone_number, user_id) {
       this.editLoading = true;
       this.editList.sendPhone = phone_number;
       this.editList.sendUser = user_id;
       this.getEdit.phone_number = phone_number;
       this.getEdit.user_id = user_id;
       await getServerList().then(response => {
-          this.servers = response.data.items;
+        this.servers = response.data.items;
       });
       await getUserList().then(response => {
-          this.userList = response.data.userList;
+        this.userList = response.data.userList;
       });
-      await editList(user_id,phone_number).then(response => {
+      await editList(user_id, phone_number).then(response => {
         console.log(response);
-         response.data.result.forEach((element) => {
-         this.formEditSms.editServerId = element['server_id'];
-         this.formEditSms.editUserName = element['user_name']; 
-         this.formEditSms.editPhoneNumber = element['phone_number'];
-         this.formEditSms.editUserId = element['user_id'];
-      });
+        response.data.result.forEach((element) => {
+          this.formEditSms.editServerId = element['server_id'];
+          this.formEditSms.editUserName = element['user_name'];
+          this.formEditSms.editPhoneNumber = element['phone_number'];
+          this.formEditSms.editUserId = element['user_id'];
+        });
       });
       this.dialogFormUpdateVisible = true;
       this.editLoading = false;
     },
-      async update(){
+    async update(){
       await UpdateSmsConnection(this.formEditSms).then((response) => {
         console.log(response);
         this.dialogFormUpdateVisible = false;
@@ -231,10 +239,10 @@ export default {
     async handleCreate() {
       this.loadingAdd = true;
       await getServerList().then(response => {
-          this.servers = response.data.items;
+        this.servers = response.data.items;
       });
       await getUserList().then(response => {
-          this.userList = response.data.userList;
+        this.userList = response.data.userList;
       });
       this.resetNewUser();
       this.dialogFormVisible = true;
@@ -247,7 +255,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-        DeleteSms(phone_number,user_id).then(response => {
+        DeleteSms(phone_number, user_id).then(response => {
           this.$message({
             type: 'success',
             message: 'Delete completed',
@@ -262,7 +270,7 @@ export default {
           message: 'Delete canceled',
         });
       });
-       this.getListSms();
+      this.getListSms();
     },
 
     createUser() {
@@ -296,9 +304,9 @@ export default {
     },
     resetNewUser() {
       this.newSms = {
-          user_id: '',
-          server_id:[],
-          phone_number: '',
+        user_id: '',
+        server_id: [],
+        phone_number: '',
       };
     },
     handleDownload() {

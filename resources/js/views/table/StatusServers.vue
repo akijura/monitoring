@@ -110,10 +110,10 @@
           <el-input v-model="form.editendpoint" value="form.endpoint" />
         </el-form-item>
         <el-form-item :label="$t('table.serverType')" prop="title">
-        <el-select v-model="form.editserver_type" placeholder="please select server type" >
-          <el-option v-for="type in server_types" :key="type" :value="type" :label="type" />
-        </el-select>
-         </el-form-item>
+          <el-select v-model="form.editserver_type" placeholder="please select server type">
+            <el-option v-for="type in server_types" :key="type" :value="type" :label="type" />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -129,7 +129,7 @@
 
 <script>
 
-import { fetchServers, fetchEditServer, UpdateServer, deleteServer, RequestServer,getServerTypes } from '@/api/servers';
+import { fetchServers, fetchEditServer, UpdateServer, deleteServer, RequestServer, getServerTypes } from '@/api/servers';
 import checkPermission from '@/utils/permission'; // Permission checking
 import permission from '@/directive/permission/index.js';
 import role from '@/directive/role/index.js';
@@ -257,9 +257,8 @@ export default {
         this.form.editendpoint = response.data.editItems.endpoint;
         this.form.editrequest_type = response.data.editItems.request_type;
         this.form.editserver_type = response.data.editItems.server_type;
-
       });
-        await getServerTypes(this.query).then(response => {
+      await getServerTypes(this.query).then(response => {
         response.data.server_types.forEach((eachType, index) => {
           this.server_types[index] = eachType['name'];
         });

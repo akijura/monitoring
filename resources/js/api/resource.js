@@ -26,7 +26,7 @@ class Resource {
       method: 'get',
     });
   }
-  getEdit(phone,user) {
+  getEdit(phone, user) {
     return request({
       url: '/' + this.uri + '/' + phone + '/' + user,
       method: 'get',

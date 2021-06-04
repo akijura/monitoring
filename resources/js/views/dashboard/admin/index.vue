@@ -11,7 +11,7 @@
     </el-card> -->
     <!-- <github-corner style="position: absolute; top: 0px; border: 0; right: 0;" /> -->
 
-    <panel-group @handleSetLineChartData="handleSetLineChartData" v-loading="loading"/>
+    <panel-group v-loading="loading" @handleSetLineChartData="handleSetLineChartData" />
 
     <el-row style="background:#fff;padding:32px 32px 0;margin-bottom:64px;">
       <line-chart :chart-data="lineChartData" />
@@ -79,15 +79,11 @@ export default {
     TodoList,
     BoxCard,
   },
-    created() {
-    this.handleSetLineChartData(this.typeDef);
-
-  },
   data() {
     return {
       lineChartData: {},
       loading: true,
-      typeDef:'Shina',
+      typeDef: 'Shina',
       list: {},
       // carouselImages: [
       //   {
@@ -103,20 +99,22 @@ export default {
       ],
     };
   },
+  created() {
+    this.handleSetLineChartData(this.typeDef);
+  },
   methods: {
     async handleSetLineChartData(type) {
-      this.loading = true;  
-     await fetchErrors(type).then(response => {
-      this.list = {
+      this.loading = true;
+      await fetchErrors(type).then(response => {
+        this.list = {
           type: {
             expectedData: response.data.expectedData,
           },
         };
         this.lineChartData = this.list.type;
-     
       });
       this.loading = false;
-    }
+    },
   },
 };
 </script>

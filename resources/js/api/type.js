@@ -1,7 +1,6 @@
 import request from '@/utils/request';
 import Resource from '@/api/resource';
 
-
 class ServerResource extends Resource {
   constructor() {
     super('types');

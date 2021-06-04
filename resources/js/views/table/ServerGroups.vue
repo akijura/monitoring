@@ -35,11 +35,11 @@
       </el-table-column>
       <el-table-column align="center" label="Action" width="350">
         <template slot-scope="scope">
-            <!-- <el-button v-role="['admin']" type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id)">
+          <!-- <el-button v-role="['admin']" type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id)">
             Edit
           </el-button> -->
 
-           <el-button v-role="['admin']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+          <el-button v-role="['admin']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Delete
           </el-button>
         </template>
@@ -73,7 +73,7 @@
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import ServerResource from '@/api/type';
 import Resource from '@/api/resource';
-import moment from 'moment'
+import moment from 'moment';
 import waves from '@/directive/waves'; // Waves directive
 import role from '@/directive/role/index.js';
 const serverResource = new ServerResource();
@@ -113,13 +113,12 @@ export default {
   created() {
     this.resetNewUser();
     this.getList();
-
   },
   methods: {
     format_date(value){
-         if (value) {
-           return moment(String(value)).format('YYYY-MM-DD h:mm:ss')
-          }
+      if (value) {
+        return moment(String(value)).format('YYYY-MM-DD h:mm:ss');
+      }
     },
     async getList() {
       const { limit, page } = this.query;
@@ -133,41 +132,41 @@ export default {
       this.loading = false;
     },
     async update() {
-     this.editLoading = true;
-        await serverResource.update(this.formupdate.editid,this.formupdate).
-        then(response => {
-              this.$message({
-                message: 'Server group ' + this.formupdate.editname + ' has been changed successfully.',
-                type: 'success',
-                duration: 5 * 1000,
-              });
-            })
-            .catch(error => {
-              console.log(error);
-            })
-            .finally(() => {
-             this.dialogFormUpdateVisible = false;
-             this.getList();
-            });;
-        this.editLoading = false;
+      this.editLoading = true;
+      await serverResource.update(this.formupdate.editid, this.formupdate)
+        .then(response => {
+          this.$message({
+            message: 'Server group ' + this.formupdate.editname + ' has been changed successfully.',
+            type: 'success',
+            duration: 5 * 1000,
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.dialogFormUpdateVisible = false;
+          this.getList();
+        });
+      this.editLoading = false;
     },
     async handleUpdate(id) {
       this.editLoading = true;
-          serverResource
-            .get(id)
-            .then(response => {
-                this.formupdate.editname  = response.data.group.name;
-                this.formupdate.editdescription  = response.data.group.description;
-                this.formupdate.editid = response.data.group.id;
-            })
-            .catch(error => {
-              console.log(error);
-            })
-            .finally(() => {
-              this.editLoading = false;
-            });
-              this.dialogFormUpdateVisible = true;
-        },
+      serverResource
+        .get(id)
+        .then(response => {
+          this.formupdate.editname = response.data.group.name;
+          this.formupdate.editdescription = response.data.group.description;
+          this.formupdate.editid = response.data.group.id;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.editLoading = false;
+        });
+      this.dialogFormUpdateVisible = true;
+    },
     handleFilter() {
       this.query.page = 1;
       this.getList();
@@ -183,7 +182,7 @@ export default {
             type: 'success',
             message: 'Delete completed',
           });
-           this.getList();
+          this.getList();
         }).catch(error => {
           console.log(error);
         });
@@ -193,7 +192,6 @@ export default {
           message: 'Delete canceled',
         });
       });
-     
     },
     // createUser() {
     //   this.$refs['userForm'].validate((valid) => {

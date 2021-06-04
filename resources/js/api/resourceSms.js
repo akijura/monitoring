@@ -14,7 +14,7 @@ class ResourceSms {
       params: query,
     });
   }
-  get(id,phone) {
+  get(id, phone) {
     return request({
       url: '/' + this.uri + '/' + id + '/' + phone,
       method: 'get',
@@ -26,7 +26,7 @@ class ResourceSms {
       method: 'get',
     });
   }
-  getEdit(phone,user) {
+  getEdit(phone, user) {
     return request({
       url: '/' + this.uri + '/' + phone + '/' + user,
       method: 'get',

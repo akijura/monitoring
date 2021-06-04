@@ -1,22 +1,26 @@
 <template>
-  <el-row :gutter="40" class="panel-group" v-loading="listLoading">
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(item, index) in list"
-          :key="index" >
+  <el-row v-loading="listLoading" :gutter="40" class="panel-group">
+    <el-col
+      v-for="(item, index) in list"
+      :key="index"
+      :xs="12"
+      :sm="12"
+      :lg="6"
+      class="card-panel-col"
+    >
       <div class="card-panel" @click="handleSetLineChartData(item.name)">
         <div class="card-panel-icon-wrapper icon-people">
           <svg-icon icon-class="international" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text"  v-bind:style="item.name === activeItem ? activePanel : nonActive" >
+          <div class="card-panel-text" :style="item.name === activeItem ? activePanel : nonActive">
             {{ item.name }}
           </div>
-         
+
           <count-to :start-val="0" :end-val="item.total" :duration="2600" class="card-panel-num" /><span> Errors</span>
         </div>
       </div>
     </el-col>
-
-
 
   </el-row>
 </template>
@@ -31,17 +35,16 @@ export default {
     CountTo,
   },
 
-    data() {
-      
+  data() {
     return {
-       activePanel: {
-    color: 'red',
-    fontSize: '30px'
-  },
-         nonActive: {
+      activePanel: {
+        color: 'red',
+        fontSize: '30px',
+      },
+      nonActive: {
 
-  },
-    list: [],
+      },
+      list: [],
       query: {
         page: 1,
         limit: 15,
@@ -51,18 +54,17 @@ export default {
       },
       listLoading: true,
       isActive: false,
-      activeItem: "Shina",
+      activeItem: 'Shina',
       counts: 0,
     };
   },
-    created() {
+  created() {
     // this.getList();
     this.countErrors();
-
   },
   methods: {
     handleSetLineChartData(type) {
-        this.activeItem = type;
+      this.activeItem = type;
       this.$emit('handleSetLineChartData', type);
     },
     // async getList() {
@@ -77,14 +79,12 @@ export default {
     //   this.listLoading = false;
     // },
     async countErrors() {
-     this.listLoading = true; 
-    await fetchErrorsCount().then(response => {
-
-       this.list = response.data.countData;
-     
+      this.listLoading = true;
+      await fetchErrorsCount().then(response => {
+        this.list = response.data.countData;
       });
       this.listLoading = false;
-    }
+    },
   },
 };
 </script>

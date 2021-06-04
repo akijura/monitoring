@@ -3,13 +3,13 @@
     <el-button class="filter-item" style="margin-left: 120px; margin-bottom: 10px;" type="success" icon="el-icon-plus" @click="handleCreateTypeServer">
       {{ $t('table.addType') }}
     </el-button>
-    <el-form ref="dataForm" :rules="rules" v-loading="typeLoading" :model="form" label-width="120px">
+    <el-form ref="dataForm" v-loading="typeLoading" :rules="rules" :model="form" label-width="120px">
 
       <el-form-item label="Server name" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
       <el-form-item label="Server Type" prop="type">
-        <el-select v-model="form.type" placeholder="please select server type" >
+        <el-select v-model="form.type" placeholder="please select server type">
           <el-option label="Production" value="production" />
           <el-option label="Test" value="test" />
         </el-select>
@@ -35,7 +35,7 @@
         <el-input v-model="form.endpoint" />
       </el-form-item>
       <el-form-item label="Server Type 2" prop="shina">
-        <el-select v-model="form.shina" placeholder="please select server type" >
+        <el-select v-model="form.shina" placeholder="please select server type">
           <el-option v-for="type in server_types" :key="type" :value="type" :label="type" />
         </el-select>
       <!-- <el-button class="cancel-btn" size="small" icon="el-icon-refresh" type="warning"  @click="handleRefresh">
@@ -141,22 +141,21 @@ export default {
     },
     onSubmit() {
       this.$refs['dataForm'].validate((valid) => {
-      if (valid) {
-        console.log(valid);
-      createServer(this.form).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Created successfully',
-          type: 'success',
-          duration: 2000,
-        });
-         this.$router.push({ path: '/table/servers-status'});
-      }).catch(error => {
-      
-        console.log(error);
-      })
-      // this.resetTemp();
-      }
+        if (valid) {
+          console.log(valid);
+          createServer(this.form).then(response => {
+            this.$notify({
+              title: 'Success',
+              message: 'Created successfully',
+              type: 'success',
+              duration: 2000,
+            });
+            this.$router.push({ path: '/table/servers-status' });
+          }).catch(error => {
+            console.log(error);
+          });
+          // this.resetTemp();
+        }
       });
     },
     async onSubmitType() {
