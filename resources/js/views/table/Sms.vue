@@ -46,7 +46,7 @@
 
     <el-dialog v-loading="loadingAdd" :title="'Create new connection'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
-        <el-form ref="newSms" :rules="rules" :model="newSms" label-position="left" label-width="150px" style="max-width: 500px;">
+        <el-form ref="newSms" :rules="rules" :model="newSms" label-position="left" label-width="200px" style="width: 600px; margin-left:50px;">
           <el-form-item :label="$t('sms.server_name')" prop="server_id">
             <el-select
               v-model="newSms.server_id"
@@ -86,7 +86,7 @@
       </div>
     </el-dialog>
     <el-dialog v-loading="editLoading" :visible.sync="dialogFormUpdateVisible">
-      <el-form ref="dataForm" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" label-position="left" label-width="200px" style="width: 600px; margin-left:50px;">
         <el-form-item :label="$t('sms.user_name')" prop="user_id">
           <el-input v-model="formEditSms.editUserName" :disabled="true" />
         </el-form-item>
