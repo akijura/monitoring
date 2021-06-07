@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,api.telegram.org')),
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,api.telegram.org,172.25.102.142:2921')),
 
     /*
     |--------------------------------------------------------------------------
