@@ -143,37 +143,53 @@ class SmsController extends Controller
     {
         $currentUser = Auth::user();
         $params = $request->all();
-        if (!$currentUser->isAdmin() && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)) 
-        {
-            return response()->json(['error' => 'Permission denied'], 403);
-        }
-
-        $validator = Validator::make($request->all(), $this->getValidationRules());
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 403);
-        } else {
-            $user_id = $params['editUserId'];
-            $editPhoneNumber = $params['editPhoneNumber'];
-            DB::table('sms')
-            ->
-            where([
-                ['user_id', $user_id],
-                ['phone_number' , $editPhoneNumber],
+        $validator = Validator::make(
+            $request->all(),
+            array_merge(
+              
+                [
+                    'phone_number' => 'regex:/^[a-zA-Z0-9 ]*$/',
                 ]
             )
-            ->delete();
-            $servers_id = $params['editServerId'];
-            foreach($servers_id as $id )
+        );
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 403);
+        } 
+        else
+        {
+            if (!$currentUser->isAdmin() && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)) 
             {
-                Sms::create([
-                    'phone_number' =>  $editPhoneNumber,
-                    'user_id' => $user_id,
-                    'server_id' => $id,
-                ]);
+                return response()->json(['error' => 'Permission denied'], 403);
             }
-            return response()->json(new JsonResponse(['params' => $params]));
-         
+    
+            $validator = Validator::make($request->all(), $this->getValidationRules());
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 403);
+            } else {
+                $user_id = $params['editUserId'];
+                $editPhoneNumber = $params['editPhoneNumber'];
+                DB::table('sms')
+                ->
+                where([
+                    ['user_id', $user_id],
+                    ['phone_number' , $editPhoneNumber],
+                    ]
+                )
+                ->delete();
+                $servers_id = $params['editServerId'];
+                foreach($servers_id as $id )
+                {
+                    Sms::create([
+                        'phone_number' =>  $editPhoneNumber,
+                        'user_id' => $user_id,
+                        'server_id' => $id,
+                    ]);
+                }
+                return response()->json(new JsonResponse(['params' => $params]));
+             
+            }
         }
+
     
       
     }
@@ -225,15 +241,30 @@ class SmsController extends Controller
   
             $params = $request->all();
             $servers_id = $params['server_id'];
-            foreach($servers_id as $id )
-            {
-                $user = Sms::create([
-                    'phone_number' => $params['phone_number'],
-                    'user_id' => $params['user_id'],
-                    'server_id' => $id,
-                ]);
+            $validator = Validator::make(
+                $request->all(),
+                array_merge(
+                  
+                    [
+                        'phone_number' => 'regex:/^[a-zA-Z0-9 ]*$/',
+                    ]
+                )
+            );
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 403);
+            } 
+            else {
+                foreach($servers_id as $id )
+                {
+                    $user = Sms::create([
+                        'phone_number' => $params['phone_number'],
+                        'user_id' => $params['user_id'],
+                        'server_id' => $id,
+                    ]);
+                }
+                return $params;
             }
-            return $params;
+
         
     }
 }
